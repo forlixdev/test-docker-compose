@@ -1,0 +1,24 @@
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+  chrome:
+    image: selenium/standalone-chrome:latest
+    ports:
+      - "4444:4444"
+    shm_size: '2gb'
+
+  test:
+    image: python:3.9
+    volumes:
+      - ./tests:/app/tests
+    depends_on:
+      - web
+      - chrome
+    working_dir: /app
+    command: sh -c "pip install selenium pytest && pytest tests/test_web.py"
+    
